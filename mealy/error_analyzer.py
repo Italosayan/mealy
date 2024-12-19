@@ -178,8 +178,9 @@ class ErrorAnalyzer(BaseEstimator):
 
         leaves_summary = []
         for leaf_id in leaf_nodes:
-            n_errors = int(self.error_tree.estimator_.tree_.value[leaf_id, 0, self.error_tree.error_class_idx])
             n_samples = self.error_tree.estimator_.tree_.n_node_samples[leaf_id]
+            class_proportion = self.error_tree.estimator_.tree_.value[leaf_id, 0, self.error_tree.error_class_idx]
+            n_errors = class_proportion * n_samples if is_regressor(self._primary_model) else int(class_proportion)
             local_error = n_errors / n_samples
             total_error_fraction = n_errors / self.error_tree.n_total_errors
             n_corrects = n_samples - n_errors
